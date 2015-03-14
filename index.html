@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <title>Google Map Marker and Info Window Customization </title>
+
+    <script src="http://maps.google.com/maps/api/js?sensor=false"
+            type="text/javascript"></script>
+
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="popup/jquery-impromptu.js"></script>
+
+    <link rel="stylesheet" media="all" type="text/css" href="popup/jquery-impromptu.css"/>
+    <link rel="stylesheet" media="all" type="text/css" href="utility/utility_style.css"/>
+
+</head>
+
+<body>
+
+<div id="map" style="width: 100%; height: 600px;"></div>
+</body>
+</html>
+
+
+<script type="text/javascript">
+
+
+    function initialize() {
+
+        var locations = [
+
+
+            ["Prince Restaurant & Party Center", 23.798386, 90.383964, 207, "Closed", "2530", "Prince Restaurant & Party Center", "0.20"],
+            ["Xinxian Restaurant", 23.746858, 90.382590, 207, "No Data", "2532", "Xinxian Restaurant", "0.01"],
+            ["Sung Garden Restaurant", 23.737430, 90.410056, 207, "Open", "2533", "Sung Garden Restaurant", "0.05"],
+            ["Hotel De Meridian and Restaurant", 23.872814, 90.401473, 207, "No Data", "2534", "Hotel De Meridian and Restaurant", "0.07"],
+            ["Hungry Deals Restaurant", 23.762841, 90.425377, 207, "No Data", "2535", "Hungry Deals Restaurant", "0.07"],
+            ["Royal Restaurant", 23.716957, 90.389671, 207, "Grand Opening", "2536", "Royal Restaurant", "0.07"],
+            ["Star Kabab & Restaurant", 23.740844, 90.380058, 207, "Advisory", "2537", "Star Kabab & Restaurant", "0.07"],
+
+
+        ];
+        window.map = new google.maps.Map(document.getElementById('map'), {
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+        var infowindow = new google.maps.InfoWindow();
+
+        var bounds = new google.maps.LatLngBounds();
+
+        for (i = 0; i < locations.length; i++) {
+
+            if (locations[i][4] == "Closed") {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                    icon: "images/pin-red.png",
+                    map: map
+                });
+            }
+
+
+            else if (locations[i][4] == "Open") {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                    icon: "images/pin-blue-open.png",
+                    map: map
+                });
+            }
+
+            else if (locations[i][4] == "Advisory") {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                    icon: "http://www.marylandhealthybeaches.com/images/pin-yellow.png",
+                    map: map
+                });
+            }
+
+
+            else if (locations[i][4] == "Grand Opening") {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                    icon: "images/pin-orange.png",
+                    map: map
+                });
+            }
+            else {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                    icon: "images/pin-white.png",
+                    map: map
+                });
+            }
+
+
+            bounds.extend(marker.position);
+
+
+            // Begin example code to get custom infobox
+            var boxText = document.createElement("div");
+            boxText.style.cssText = "border: 1px solid black; margin-top: 8px; background: yellow; padding: 5px;";
+            boxText.innerHTML = marker.html;
+
+            var myOptions = {
+                content: boxText
+                , disableAutoPan: false
+                , maxWidth: 0
+                , pixelOffset: new google.maps.Size(-140, 0)
+                , zIndex: null
+                , boxStyle: {
+                    background: "url('http://google-maps-utility-library-v3.googlecode.com/svn/tags/infobox/1.1.12/examples/tipbox.gif') no-repeat"
+                    , opacity: 0.75
+                    , width: "280px"
+                }
+                , closeBoxMargin: "10px 2px 2px 2px"
+                , closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif"
+                , infoBoxClearance: new google.maps.Size(1, 1)
+                , isHidden: false
+                , pane: "floatPane"
+                , enableEventPropagation: false
+            };
+            // end example code for custom infobox
+
+
+            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                return function () {
+                    infowindow.setContent('<div class="info"><div class="info_content"><div class="info_contentt"><div class="info_contenttt"><b>' + locations[i][0] + '</b></div><div class="info_contenttm"><div class="info_contenttml"></div><div class="info_contenttmr">' + locations[i][6] + '</div></div><div class="info_contenttb">Current Status: <b>' + locations[i][4] + '"</b></div></div><div class="info_contentb"><table><tr><td>Get Subscription: </td><td><img src="images/btn-alert-email.png" onclick="emailFunction(' + locations[i][5] + ')" /></td><td><img src="images/btn-alert-text.png" onclick="mobileFunction(' + locations[i][5] + ')" /></td></tr></table>			</div></div></div>');
+
+
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
+
+
+        }
+
+
+        map.fitBounds(bounds);
+
+        var listener = google.maps.event.addListener(map, "idle", function () {
+            map.setZoom(11);
+            google.maps.event.removeListener(listener);
+        });
+    }
+
+    function loadScript() {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&' + 'callback=initialize';
+        document.body.appendChild(script);
+    }
+
+    window.onload = loadScript;
+</script>
+
+<script type="text/javascript" src="utility/utility.js"></script>
